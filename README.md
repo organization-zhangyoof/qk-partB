@@ -1,2 +1,15 @@
-# qk-partB
-乾坤子应用B
+# umi project
+
+## Getting Started
+
+Install dependencies,
+
+```bash
+$ yarn
+```
+
+Start the dev server,
+
+```bash
+$ yarn start
+```

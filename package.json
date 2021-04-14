@@ -1,0 +1,41 @@
+{
+    "name": "qk-part3",
+    "displayName": "乾坤3",
+    "private": true,
+    "scripts": {
+        "start": "umi dev",
+        "build": "umi build",
+        "postinstall": "umi generate tmp",
+        "prettier": "prettier --write '**/*.{js,jsx,tsx,ts,less,md,json}'",
+        "test": "umi-test",
+        "test:coverage": "umi-test --coverage"
+    },
+    "gitHooks": {
+        "pre-commit": "lint-staged"
+    },
+    "lint-staged": {
+        "*.{js,jsx,less,md,json}": [
+            "prettier --write"
+        ],
+        "*.ts?(x)": [
+            "prettier --parser=typescript --write"
+        ]
+    },
+    "dependencies": {
+        "@umijs/preset-react": "1.x",
+        "ahooks": "^2.10.0",
+        "antd": "3.26.20",
+        "axios": "^0.21.1",
+        "jwt-decode": "^3.1.2",
+        "localforage": "^1.9.0",
+        "qs": "^6.10.1",
+        "react": "^16.8.6",
+        "react-dom": "^16.13.1",
+        "umi": "^3.3.10",
+        "yorkie": "^2.0.0"
+    },
+    "devDependencies": {
+        "@umijs/plugin-qiankun": "^2.24.1",
+        "babel-plugin-import": "1.13.3"
+    }
+}
