@@ -1,11 +1,11 @@
-import React from 'react';
+import React,{createContext} from 'react';
 import jwtDecode from 'jwt-decode';
 import localforage from 'localforage';
 
 import { useRequest, useMount } from 'ahooks';
 import * as services from '../services/layoutServices'
 
-
+export const {Provider,Consumer} = createContext("");
 interface basalInfoObj {
     token: string;
     appId: string;
@@ -17,7 +17,14 @@ interface basalInfoObj {
     query: any;
     userInfo: Object;
     limitBtns: Array<any>;
+    allContractList: Array<any>;
     contractList: Array<any>;
+    allProjectList: Array<any>;
+    projectList: Array<any>;
+    menuList: Array<any>;
+    curNavBar: Array<any>;
+    curLevelOneMenu: Object;
+    [propName: string] : any;
 }
 interface ordinaryObj {
     [propName: string] : any;
@@ -31,10 +38,16 @@ export const basalInfo: basalInfoObj = {
     type: '',
     isSecondJump: false,
     userIndentity: '',
-    query:{},
-    userInfo:{},
-    limitBtns:[],
-    contractList:[],
+    query: {},
+    userInfo: {},
+    limitBtns: [],
+    allContractList: [],
+    contractList: [],
+    projectList: [],
+    allProjectList: [],
+    menuList: [],
+    curNavBar: [],
+    curLevelOneMenu: [],
 }
 
 export const startFun = async () => {
@@ -137,52 +150,62 @@ export const getProjectList = async () => {
     (window as any).__PROJECT_LIST__ = projectList;
     (window as any).__ALL_PROJECT_LIST__ = projectList;
     localforage.setItem('allProjectList', projectList)
+    basalInfo.projectList = projectList;
+    basalInfo.allProjectList = projectList;
     getContractList()
-    await userNotOwnerHandleProject()
-    console.log('非业主')
 }
 
 //非业主时对项目合同段进行相应处理
-export const userNotOwnerHandleProject = async () => {
+export const userNotOwnerHandleProject = async (params:any) => {
+    console.log('params---',params)
     const { token, appId, tenantId, userIndentity, query, userInfo } = basalInfo
     const originProjectId = query.projectId;
     const projectList: any = await localforage.getItem('allProjectList')
     if (projectList && !!projectList.length && projectList.length > 1) {
-        let idx = 0
-        for (let i = 0; i < projectList.length; i++) {
-            const ele = projectList[i];
-            if (ele.id == originProjectId) {
-                idx = i;
-                break
+        if (!originProjectId) {
+            params.setState({
+                visibleSelectProject:true
+            })
+            basalInfo.menuList = [{id:'selectProject',name:'选择项目'}];
+            basalInfo.curNavBar=[{id: 'selectProject', name: '选择项目'}];
+            basalInfo.curLevelOneMenu={id: 'selectProject', name: '选择项目'};
+        } else {
+            let idx = 0
+            for (let i = 0; i < projectList.length; i++) {
+                const ele = projectList[i];
+                if (ele.id == originProjectId) {
+                    idx = i;
+                    break
+                }
             }
+            //存储被选中的项目ID
+            sessionStorage.selectPrjId = projectList[idx].id;
+            (window as any).__SELECT_PROJECT_ID__ = projectList[idx].id;
+
+            sessionStorage.selectPrj = JSON.stringify(projectList[idx]);
+            (window as any).__SELECT_PROJECT__ = projectList[idx];
+
+            //将项目信息存储到userInfo
+            sessionStorage.userInfo = JSON.stringify((window as any).__USERINFO__.project = projectList[idx]);
+
+            //发送消息给实景
+            let token = (window as any).__TOKEN___
+            let userInfo = (window as any).__USERINFO__
+            let limitBtns = (window as any).__LIMIT_BUTTONS__
+            let projectId = projectList[idx].id
+            let isvisibleBim = (window as any).__ISVISIBLE_BIM__
+            let userIndentity = (window as any).__USER_IDENTITY__
+            let parentHost = (window as any).location.origin
+            let iframeInfo = { token, userInfo, limitBtns, projectId, isvisibleBim, userIndentity, parentHost, appId, isBim: true }
+            for (let index = 0; index < (window as any).frames.length; index++) {
+                (window as any).frames[index] && (window as any).frames[index].postMessage(iframeInfo, '*');
+            }
+            //   yield put({
+            //     type: 'projectSelect/setProjectId',
+            //     projectId: projectId
+            //   })
         }
 
-        //存储被选中的项目ID
-        sessionStorage.selectPrjId = projectList[idx].id
-            (window as any).__SELECT_PROJECT_ID__ = projectList[idx].id
-
-        sessionStorage.selectPrj = JSON.stringify(projectList[idx]);
-        (window as any).__SELECT_PROJECT__ = projectList[idx]
-
-        //将项目信息存储到userInfo
-        sessionStorage.userInfo = JSON.stringify((window as any).__USERINFO__.project = projectList[idx])
-
-        //发送消息给实景
-        let token = (window as any).__TOKEN___
-        let userInfo = (window as any).__USERINFO__
-        let limitBtns = (window as any).__LIMIT_BUTTONS__
-        let projectId = projectList[idx].id
-        let isvisibleBim = (window as any).__ISVISIBLE_BIM__
-        let userIndentity = (window as any).__USER_IDENTITY__
-        let parentHost = (window as any).location.origin
-        let iframeInfo = { token, userInfo, limitBtns, projectId, isvisibleBim, userIndentity, parentHost, appId, isBim: true }
-        for (let index = 0; index < (window as any).frames.length; index++) {
-            (window as any).frames[index] && (window as any).frames[index].postMessage(iframeInfo, '*');
-        }
-        //   yield put({
-        //     type: 'projectSelect/setProjectId',
-        //     projectId: projectId
-        //   })
     } else if (projectList && !!projectList.length && projectList.length == 1) {
         //一个项目，默认选中第一个
         // yield put({
@@ -196,7 +219,7 @@ export const userNotOwnerHandleProject = async () => {
 
         //存储被选中的项目ID
         sessionStorage.selectPrjId = projectList[0].id
-            (window as any).__SELECT_PROJECT_ID__ = projectList[0].id
+        (window as any).__SELECT_PROJECT_ID__ = projectList[0].id
 
         sessionStorage.selectPrj = JSON.stringify(projectList[0]);
         (window as any).__SELECT_PROJECT__ = projectList[0]
@@ -223,6 +246,7 @@ export const userNotOwnerHandleProject = async () => {
         //   projectId: projectId
         // })
     }
+    console.log("非业主处理项目合同段")
 }
 
 //获取合同段列表
@@ -233,6 +257,7 @@ export const getContractList = () => {
         contractList = [...contractList, ...project.contractList];
     });
     basalInfo.contractList = contractList;
+    basalInfo.allContractList = contractList;
     //   //存储合同段列表
     localforage.setItem('contractList', contractList);
     (window as any).__CONTRACT_LIST__ = contractList;
@@ -248,9 +273,9 @@ export const getButtonPermissions = async () => {
     //存储权限按钮
     if(res.code == 200 || res.code == 201){
         localforage.setItem('limitButtons', res.data);
-        basalInfo.limitBtns = res.data
-        (window as any).__LIMIT_BUTTONS__ = res.data
-        localforage.setItem('limitBtns', res.data)
+        basalInfo.limitBtns = res.data;
+        (window as any).__LIMIT_BUTTONS__ = res.data;
+        localforage.setItem('limitBtns', res.data);
     }
     console.log("权限----",res)
     
@@ -261,5 +286,23 @@ export const getMenuList = async () => {
     const res = await services.getMenuList();
     if(res.code == 200 || res.code == 201){
 
+    }
+}
+
+
+
+
+
+//更新basalInfor
+export const updateBasalInfor = async ({that = '',key = '',value = ''}:{that?:any,key?:string,value?:any}) => {
+    if(that){
+        let obj:ordinaryObj = {}
+        obj[key] = value
+        that.setState({
+           obj
+        })
+        basalInfo[key] = value
+    }else{
+        basalInfo[key] = value
     }
 }

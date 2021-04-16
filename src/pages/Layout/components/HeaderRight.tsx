@@ -179,7 +179,7 @@ export default (props: any) => {
             }}
             // onClick={this.chooseOperate.bind(this)}
           >
-            <span style={{ color: '#fff' }}>{window.__USERINFO__?.name}</span>
+            <span style={{ color: '#fff' }}>{(window as any).__USERINFO__?.name}</span>
             <Icon
               type="caret-down"
               style={{ color: '#fff', marginLeft: '3px' }}

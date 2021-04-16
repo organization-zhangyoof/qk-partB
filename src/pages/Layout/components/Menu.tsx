@@ -1,6 +1,8 @@
-import React from 'react';
+import React,{Component}  from 'react';
 import '../styles/menu.less';
-class Menu extends React.Component {
+
+
+class Menu extends React.Component<any,any>{
   constructor(props: any) {
     super(props);
     this.state = {
@@ -24,13 +26,26 @@ class Menu extends React.Component {
   }
 
   render() {
+      const { menuList,curLevelOneMenu } = this.props
+      const { hoverMenuId, clickMenuId } = this.state
+      console.log("menuList---",menuList)
     return (
       <div className="_ewec_layout_menu_">
         <ul>
-          <li>首页</li>
-          <li>首页1</li>
-          <li>首页2</li>
-          <li>首页3</li>
+            {
+                menuList?.map((item: any) => {
+                    // console.log("item.name--",item.name)
+                    return (
+                        <li
+                            style={{
+                                background: (curLevelOneMenu.id == item.id || hoverMenuId == item.id || clickMenuId == item.id) ? 'rgba(255, 255, 255, 0.3)' : 'transparent',
+                                color: (curLevelOneMenu.id == item.id || hoverMenuId == item.id || clickMenuId == item.id) ? '#fff' : (item.children && item.children.length > 0 ? 'rgba(255, 255, 255, 0.84)' : (item.route == '#' ? 'rgba(255, 255, 255, 0.3)' :'rgba(255, 255, 255, 0.84)')),
+                                cursor: item.children && item.children.length > 0 ? 'pointer' : (item.route == '#' ? 'not-allowed' : 'pointer')
+                            }}
+                        >{item.name}</li>
+                    )
+                })
+            }
         </ul>
       </div>
     );
