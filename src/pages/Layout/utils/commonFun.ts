@@ -207,15 +207,6 @@ export const userNotOwnerHandleProject = async () => {
         }
 
     } else if (projectList && !!projectList.length && projectList.length == 1) {
-        //一个项目，默认选中第一个
-        // yield put({
-        //   type: 'menuDirectory/getMenuList', params: {
-        //     project: projectList[0],
-        //     projectId: projectList[0].id,
-        //     tenantId,
-        //     appId
-        //   }
-        // });
 
         //存储被选中的项目ID
         sessionStorage.selectPrjId = projectList[0].id
