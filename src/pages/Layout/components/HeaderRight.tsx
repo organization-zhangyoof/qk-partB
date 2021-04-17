@@ -188,7 +188,7 @@ export default (props: any) => {
                                         }
                                         style={{width:100,marginRight:10}}
                                         onChange = {
-                                            (val)=>{onChangeSelectProject(val,setState,value)}
+                                            (val:string)=>{onChangeSelectProject(val,setState,value)}
                                         }
                                     >
                                         {allProjectList.map((item: any) =>
