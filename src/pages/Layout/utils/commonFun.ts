@@ -4,8 +4,10 @@ import localforage from 'localforage';
 
 import { useRequest, useMount } from 'ahooks';
 import * as services from '../services/layoutServices'
-
-export const {Provider,Consumer} = createContext("");
+interface ordinaryObj {
+    [propName: string] : any | ordinaryObj;
+}
+export const {Provider,Consumer} = createContext<ordinaryObj>({});
 interface basalInfoObj {
     token: string;
     appId: string;
@@ -15,7 +17,7 @@ interface basalInfoObj {
     isSecondJump: boolean;
     userIndentity: string;
     query: any;
-    userInfo: Object;
+    userInfo: ordinaryObj;
     limitBtns: Array<any>;
     allContractList: Array<any>;
     contractList: Array<any>;
@@ -24,13 +26,13 @@ interface basalInfoObj {
     menuList: Array<any>;
     curNavBar: Array<any>;
     curLevelOneMenu: Object;
-    [propName: string] : any;
-}
-interface ordinaryObj {
+    isvisibleBim: boolean,
+    selectProjectId: string,
     [propName: string] : any;
 }
 
-export const basalInfo: basalInfoObj = {
+
+export let basalInfo: basalInfoObj = {
     token: '',
     appId: '',
     tenantId: '',
@@ -48,6 +50,8 @@ export const basalInfo: basalInfoObj = {
     menuList: [],
     curNavBar: [],
     curLevelOneMenu: [],
+    isvisibleBim:false,
+    selectProjectId:'',
 }
 
 export const startFun = async () => {
@@ -156,16 +160,12 @@ export const getProjectList = async () => {
 }
 
 //非业主时对项目合同段进行相应处理
-export const userNotOwnerHandleProject = async (params:any) => {
-    console.log('params---',params)
+export const userNotOwnerHandleProject = async () => {
     const { token, appId, tenantId, userIndentity, query, userInfo } = basalInfo
     const originProjectId = query.projectId;
     const projectList: any = await localforage.getItem('allProjectList')
     if (projectList && !!projectList.length && projectList.length > 1) {
         if (!originProjectId) {
-            params.setState({
-                visibleSelectProject:true
-            })
             basalInfo.menuList = [{id:'selectProject',name:'选择项目'}];
             basalInfo.curNavBar=[{id: 'selectProject', name: '选择项目'}];
             basalInfo.curLevelOneMenu={id: 'selectProject', name: '选择项目'};
@@ -289,20 +289,63 @@ export const getMenuList = async () => {
     }
 }
 
+//选择项目
+export const selectProject = async (params: ordinaryObj) => {
+    debugger
+    (window as any).__HIDE_NAV__ = false
+    let prjData: Array<any> = []
+    prjData.push(params.project)
 
+    
+    //设置后端项目选择缓存
+    services.setProjectCache({projectId:params?.project?.id})
+    //存储被选中的项目ID
+    sessionStorage.selectPrjId = prjData[0].id;
+    (window as any).__SELECT_PROJECT_ID__ = prjData[0].id;
 
+    //存储被选中的项目
+    sessionStorage.selectPrj = JSON.stringify(prjData);
+    (window as any).__SELECT_PROJECT__ = prjData;
 
+    //将项目信息存储到userInfo
+    sessionStorage.userInfo = JSON.stringify((window as any).__USERINFO__.project = prjData);
 
-//更新basalInfor
-export const updateBasalInfor = async ({that = '',key = '',value = ''}:{that?:any,key?:string,value?:any}) => {
-    if(that){
-        let obj:ordinaryObj = {}
-        obj[key] = value
-        that.setState({
-           obj
-        })
-        basalInfo[key] = value
-    }else{
-        basalInfo[key] = value
+    //更新项目列表和合同段列表
+    let prjDatas = (window as any).__ALL_PROJECT_LIST__;
+    let ctrDatas = (window as any).__ALL_CONTRACT_LIST__;
+    let newPrjData = [], newCtrData = [];
+    newPrjData = prjDatas.filter((item:any)=>item.id == params?.project?.id);
+    newCtrData = newPrjData.contractList;
+
+    localforage.setItem('projectList', newPrjData);
+    (window as any).__PROJECT_LIST__ = newPrjData;
+    localforage.setItem('contractList', newCtrData);
+    (window as any).__CONTRACT_LIST__ = newCtrData;
+    basalInfo.projectList = prjData
+    basalInfo.contractList = newCtrData
+    basalInfo.selectProjectId = prjData[0].id
+    basalInfo.userInfo.project = prjData
+
+    //发送消息给实景
+    const { token, appId, tenantId, userInfo, userIndentity, limitBtns, isvisibleBim } = basalInfo
+    let projectId = params.project.id
+    let parentHost = (window as any).location.origin
+    let iframeInfo = { token, userInfo, limitBtns, projectId, isvisibleBim, userIndentity, parentHost, appId, isBim: true }
+    for (let index = 0; index < (window as any).frames.length; index++) {
+        (window as any).frames[index] && (window as any).frames[index].postMessage(iframeInfo, '*');
     }
+
+    // await updateBasalInfor({that:params.that,stateChange:{basalInfo:{...basalInfo,aaa:'454654654'},visibleSelectProject:false}})
+    params.setState({...basalInfo,visibleSelectProject:false})
 }
+
+//更新bascalInfo以及state
+
+export const updateState = (params:any) => {
+    
+}
+
+
+
+
+

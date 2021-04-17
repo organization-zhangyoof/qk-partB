@@ -6,10 +6,10 @@ export default (props: any) => {
     'http://dd-test.gcnao.cn/gateway/application/ddApplicationManage/download?id=fff65187cc5d4d539eb12dd8cda4b511';
   return (
     <div className="_ewec_layout_logo_">
-      <p className="_ewec_layout_logo_img_">
+      <div className="_ewec_layout_logo_img_">
         <img src={logo} alt="" />
-      </p>
-      <p className="_ewec_layout_logo_title_">这是title</p>
+      </div>
+      <div className="_ewec_layout_logo_title_">这是title</div>
     </div>
   );
 };

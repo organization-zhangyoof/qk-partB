@@ -19,3 +19,7 @@ export const getProjectList = () => {
 export const getButtonPermissions = () => {
     return request('get', `${commonConfig.SERVICE_API.INDEX_API}/accountInfo/getButtons`, '', false);
 }
+////设置后端项目选择缓存
+export const setProjectCache = (params:any) => {
+    return request('get', `${commonConfig.SERVICE_API.INDEX_API}/accountInfo/setProjectCache`, '', false);
+}

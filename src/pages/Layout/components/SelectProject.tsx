@@ -3,14 +3,15 @@ import { Input, Button, Icon } from 'antd'
 import '../styles/selectProject.less'
 
 import * as CF from '../utils/commonFun'
-const { Consumer } = CF
-
+const { Consumer,selectProject } = CF
+interface ordinaryObj {
+    [propName: string] : any;
+}
 export default (props: any) => {
-    const [selectId,setSelectId] = useState('')
-    console.log('selectId----',selectId)
+    const [result,setResult] = useState<ordinaryObj>({})
     return (
         <Consumer>
-            {({projectList,changeBasalInfo}) => {
+            {({projectList = [],setState}) => {
                 return (
                     <div className="_ewec_layout_select_project_">
                         <div className="_select_project_container_">
@@ -26,10 +27,10 @@ export default (props: any) => {
                             </div>
                             <div className="_select_project_body_">
                                 {
-                                    projectList?.map((item:any)=>{
+                                    projectList.map((item:any)=>{
                                         return (
-                                            <div className={item.id == selectId?'_select_project_body_item_choice_':'_select_project_body_item_'}
-                                                onClick={(e:any)=>setSelectId(item.id)} 
+                                            <div className={item.id == result.id?'_select_project_body_item_choice_':'_select_project_body_item_'}
+                                                onClick={(e:any)=>setResult(item)} 
                                                 key={item.id}
                                             >
                                                 <div className="name">{item.name}</div>
@@ -40,7 +41,10 @@ export default (props: any) => {
                                 
                             </div>
                             <div className="_select_project_footer_">
-                                <Button type="primary" onClick={()=>changeBasalInfo({isChangState:false,})}>进入项目</Button>
+                                <Button type="primary" 
+                                    onClick={()=>{selectProject({setState,project:result})}}>
+                                    进入项目
+                                </Button>
                             </div>
                         </div>
                     </div>

@@ -26,17 +26,18 @@ class Menu extends React.Component<any,any>{
   }
 
   render() {
-      const { menuList,curLevelOneMenu } = this.props
+      const { menuList = [],curLevelOneMenu } = this.props
       const { hoverMenuId, clickMenuId } = this.state
       console.log("menuList---",menuList)
     return (
       <div className="_ewec_layout_menu_">
         <ul>
             {
-                menuList?.map((item: any) => {
+                menuList.map((item: any) => {
                     // console.log("item.name--",item.name)
                     return (
                         <li
+                            key = {item.id}
                             style={{
                                 background: (curLevelOneMenu.id == item.id || hoverMenuId == item.id || clickMenuId == item.id) ? 'rgba(255, 255, 255, 0.3)' : 'transparent',
                                 color: (curLevelOneMenu.id == item.id || hoverMenuId == item.id || clickMenuId == item.id) ? '#fff' : (item.children && item.children.length > 0 ? 'rgba(255, 255, 255, 0.84)' : (item.route == '#' ? 'rgba(255, 255, 255, 0.3)' :'rgba(255, 255, 255, 0.84)')),
