@@ -1,60 +1,55 @@
 ._ewec_layout_menu_ {
-  flex: 1;
-  background: #eb3149;
-  height: 100%;
-  position: relative;
-  white-space: nowrap;
-  overflow-x: hidden;
-  transition: all 1s;
-
-  ul {
-    position: absolute;
-    left: 0;
-    top: 0;
-    transition: all 1s;
+    flex: 1;
+    background: #eb3149;
     height: 100%;
-    list-style: none;
-    padding-inline-start: 0;
-    margin-block-end: 0;
-    margin-block-start: 0;
-    li {
-      list-style: none;
-      display: inline-block;
-      line-height: 70px;
-      color: rgba(255, 255, 255, 0.847058823529412);
-      font-family: 'Arial Normal', 'Arial';
-      font-size: 14px;
-      padding: 0 15px;
-      cursor: pointer;
-      position: relative;
-      text-align: center;
-      min-width: 5.2em;
+    position: relative;
+    white-space: nowrap;
+    overflow-x: hidden;
+    transition: all 1s;
 
-      &:hover {
-        background: rgba(255, 255, 255, 0.3);
-        color: #fff;
-      }
-
-      .choose {
-        display: inline-block;
-        background: #fff;
-        width: 0.8em;
-        height: 0.8em;
+    ul {
         position: absolute;
-        bottom: -0.4em;
         left: 0;
-        right: 0;
-        margin: auto;
-        transform: rotate(45deg);
-        -ms-transform: rotate(45deg);
-        /* IE 9 */
-        -moz-transform: rotate(45deg);
-        /* Firefox */
-        -webkit-transform: rotate(45deg);
-        /* Safari 和 Chrome */
-        -o-transform: rotate(45deg);
-        /* Opera */
-      }
+        top: 0;
+        transition: all 1s;
+        height: 100%;
+        list-style: none;
+        padding-inline-start: 0;
+        margin-block-end: 0;
+        margin-block-start: 0;
+
+        li {
+            list-style: none;
+            display: inline-block;
+            line-height: 70px;
+            color: rgba(255, 255, 255, 0.847058823529412);
+            font-family: 'Arial Normal', 'Arial';
+            font-size: 14px;
+            padding: 0 15px;
+            cursor: pointer;
+            position: relative;
+            text-align: center;
+            min-width: 5.2em;
+
+            &:hover {
+                // background: rgba(255, 255, 255, 0.3);
+                background: green;
+                color: #fff;
+            }
+
+            .choose {
+                display: inline-block;
+                position: absolute;
+                width: 0;
+                height: 0;
+                border-left: 10px solid transparent;
+                border-right: 10px solid transparent;
+                border-bottom: 10px solid #fff;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                margin: auto;
+            }
+        }
     }
-  }
 }

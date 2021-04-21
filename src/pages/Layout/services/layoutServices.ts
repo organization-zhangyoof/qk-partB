@@ -23,3 +23,7 @@ export const getButtonPermissions = () => {
 export const setProjectCache = (params:any) => {
     return request('get', `${commonConfig.SERVICE_API.INDEX_API}/accountInfo/setProjectCache`, '', false);
 }
+//获取通知待办数量
+export const getToDoNumber = (params:any) => {
+    return request('get', `${commonConfig.SERVICE_API.INDEX_API}/summarytasks/getTodoNum`, '', false);
+}

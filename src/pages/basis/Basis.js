@@ -1,6 +1,7 @@
 import React,{useState,useEffect } from'react'
 import styles from './index.less'
 import Layout from '../Layout/index'
+import Home from '../home/Home'
 const Body = (props) => {
     return(
         // <div className = {styles._basis_main_}>
@@ -12,7 +13,7 @@ const Body = (props) => {
         //         </div>
         //     </div>
         // </div>
-        <Layout/>
+        <Layout><Home/></Layout>
     )
 }
 

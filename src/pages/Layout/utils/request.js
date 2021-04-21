@@ -88,6 +88,7 @@ const request = function (type, url, params, isToast, responseType = 'json',isSt
   instance.interceptors.response.use((response) => response, (error) => Promise.reject(error));
 
   return new Promise((resolve, reject) => {
+      debugger
     instance.request(obj)
     .then((res) => {
       if (res.status == 200) {
@@ -120,10 +121,12 @@ const request = function (type, url, params, isToast, responseType = 'json',isSt
       customNotice({ type:'error', message: '请求失败', description: ''});
       reject(res.data);
     }, (err) => {
+        debugger
       let parseError = JSON.parse(JSON.stringify(err));
-      let code = parseError.response.status;
+      let code = parseError.response?.status || 401;
       if (code == 401) {
-        return window.g_app._store.dispatch({type: 'global/getUngrantInfo', params: {}});
+        customNotice({ type:'error', message: 'tken过期', description: ''});
+        // return window.g_app._store.dispatch({type: 'global/getUngrantInfo', params: {}});
       }
       if (code >= 500) {
         customNotice({ type:'error', message: '服务端异常', description: ''});
@@ -134,6 +137,7 @@ const request = function (type, url, params, isToast, responseType = 'json',isSt
       reject(code);
     })
     .catch((e) => {
+        debugger
       customNotice({ type:'error', message: '异常', description: ''});
       reject(e);
     });

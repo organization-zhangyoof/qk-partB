@@ -1,5 +1,6 @@
+@import '~antd/lib/style/themes/default.less';
 ._ewec_layout_container_ {
-  background: #4b85fc;
+  background: #f1f1f1;
   height: 100%;
   width: 100%;
   position: relative;
@@ -9,5 +10,15 @@
     display: flex;
     align-items: center;
     height: 70px;
+    background: @primary-color;
+    position: relative;
+  }
+  ._ewec_layout_content_spin_{
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
   }
 }

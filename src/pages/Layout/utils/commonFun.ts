@@ -9,26 +9,36 @@ interface ordinaryObj {
 }
 export const {Provider,Consumer} = createContext<ordinaryObj>({});
 interface basalInfoObj {
-    token: string;
-    appId: string;
-    tenantId: string;
-    title: string;
+    token: string; //身份令牌
+    appId: string; //应用ID
+    tenantId: string; //租户ID
+    title: string; 
     type: string;
-    isSecondJump: boolean;
-    userIndentity: string;
-    query: any;
-    userInfo: ordinaryObj;
-    limitBtns: Array<any>;
-    allContractList: Array<any>;
-    contractList: Array<any>;
-    allProjectList: Array<any>;
-    projectList: Array<any>;
-    menuList: Array<any>;
-    curNavBar: Array<any>;
-    curLevelOneMenu: Object;
-    isvisibleBim: boolean,
-    selectProjectId: string,
+    isSecondJump: boolean; //是否二次跳转
+    userIndentity: string;//用户角色
+    query: ordinaryObj; //跳转链接的参数
+    userInfo: ordinaryObj; //用户信息
+    limitBtns: Array<any>; //权限按钮数据
+    allContractList: Array<any>; //全部的合同段数据
+    contractList: Array<any>; //有权限的合同段数据
+    allProjectList: Array<any>; //全部的项目数据
+    projectList: Array<any>; //有权限的项目数据
+    isvisibleBim: boolean, //是否显示BIM
+    selectProjectId: string, //非业主选中的项目ID
+    todoNum: number,//待办数量
+    noticeNum: number,//通知数量
+    menuInfo: menuInfoObj,//菜单信息
     [propName: string] : any;
+}
+interface menuInfoObj {
+    menuList: Array<any>,//菜单数据
+    curLevelOneMenu: object,//当前选中的一级菜单数据
+    hoverLevelOneId: string,//鼠标悬停的一级菜单ID
+    choiceLevelOneId: string,//选中的一级菜单ID
+    currentNavbar: Array<any>,//当前的导航数据
+    currentRoute:string,//当前的路由地址
+    choiceMenuId:string,//选择的路由id
+
 }
 
 
@@ -47,18 +57,27 @@ export let basalInfo: basalInfoObj = {
     contractList: [],
     projectList: [],
     allProjectList: [],
-    menuList: [],
-    curNavBar: [],
-    curLevelOneMenu: [],
     isvisibleBim:false,
     selectProjectId:'',
+    todoNum:0,
+    noticeNum:0,
+    menuInfo:{
+        menuList:[],
+        curLevelOneMenu:{},
+        hoverLevelOneId:'',
+        choiceLevelOneId:'',
+        choiceMenuId:'',
+        currentNavbar:[],
+        currentRoute:'',
+    }
 }
 
 export const startFun = async () => {
+
     getUrlInfo()
     getUserInfo((window as any).__TOKEN___)
     await getUserIdentity()
-
+    await getToDoNumber()
     console.log('----basalInfo---', basalInfo)
     return basalInfo
 }
@@ -67,9 +86,11 @@ export const startFun = async () => {
 export const getUrlInfo = () => {
     (window as any).__PARENT_URL__ = document.referrer || sessionStorage.parentUrl;
     const url = decodeURI(decodeURI(window.location.search));
-    debugger
+    
     let query = getParamsToObject(url);
     basalInfo.query = query;
+    basalInfo.pathname = window.location.pathname;
+    debugger
     (window as any).__TOKEN___ = basalInfo.token = getUrlParam('token', url) || sessionStorage.token;
     (window as any).__SZ_TOKEN__ = "eyJhbGciOiJIUzI1NiJ9.eyJhY2NvdW50SWQiOiJhODA5NzQ3OWZhNDc0OTZhYTkzZTU5NTE4ZGQ4YWE1ZSIsImVtYWlsIjoiMTQxMjAwMDAzMzNAcXEuY29tIiwibmFtZSI6Ium7hOaZluS_nSIsInVzZXJuYW1lIjoiaHVpYmFvIiwicGhvbmVOdW1iZXIiOiIxNDEyMDAwMDMzMyIsImFjY291bnRUeXBlIjoiUEVSU09OQUwiLCJ1c2VySWQiOiI2YTUyNTY1NjEzYmM0MjE4ODdhM2M1M2MwNmZjNzAyOCIsImNvbXBhbnlJZCI6IjAzMGIxOTdiZDQ3NTQyZDZiNjg2OTE2Njc4OGI0ZDYyIiwiY29tcGFueU5hbWUiOiLmt7HlnLPluILkuqTpgJrlhaznlKjorr7mlr3lu7rorr7kuK3lv4MiLCJleHAiOjE2MTA1NDM1ODV9.uzJwuveOTfx-r2_4jIdgDHvebb5G4G4KjgXxdFZYEhA";
     (window as any).__APPID__ = basalInfo.appId = getUrlParam('appId', url) || sessionStorage.appId;
@@ -128,8 +149,8 @@ export const getUserIdentity = async () => {
     basalInfo.userIndentity = sessionStorage.userIdentity;
     await getProjectList()
     console.log('项目')
-    await getButtonPermissions()
-    console.log("按钮权限")
+    // await getButtonPermissions()
+    // console.log("按钮权限")
 
     //业主，直接加载菜单
     if (userIdentity.data.type === 'OWNERPORTAL') {
@@ -166,9 +187,10 @@ export const userNotOwnerHandleProject = async () => {
     const projectList: any = await localforage.getItem('allProjectList')
     if (projectList && !!projectList.length && projectList.length > 1) {
         if (!originProjectId) {
-            basalInfo.menuList = [{id:'selectProject',name:'选择项目'}];
-            basalInfo.curNavBar=[{id: 'selectProject', name: '选择项目'}];
-            basalInfo.curLevelOneMenu={id: 'selectProject', name: '选择项目'};
+            basalInfo.menuInfo.menuList = [{ id: 'selectProject', name: '选择项目' }];
+            basalInfo.menuInfo.currentNavbar = [{ id: 'selectProject', name: '选择项目' }];
+            basalInfo.menuInfo.curLevelOneMenu = { id: 'selectProject', name: '选择项目' };
+            basalInfo.menuInfo.choiceLevelOneId = 'selectProject';
         } else {
             let idx = 0
             for (let i = 0; i < projectList.length; i++) {
@@ -262,7 +284,7 @@ export const getContractList = () => {
 export const getButtonPermissions = async () => {
     const res = await services.getButtonPermissions();
     //存储权限按钮
-    if(res.code == 200 || res.code == 201){
+    if(isSuccess(res.code)){
         localforage.setItem('limitButtons', res.data);
         basalInfo.limitBtns = res.data;
         (window as any).__LIMIT_BUTTONS__ = res.data;
@@ -274,9 +296,18 @@ export const getButtonPermissions = async () => {
 
 //获取用户授权菜单列表
 export const getMenuList = async () => {
+    const { pathname } = basalInfo
     const res = await services.getMenuList();
-    if(res.code == 200 || res.code == 201){
+    if(isSuccess(res.code)){
+        ////剔除number为app的菜单项
+        let menuList:any = res.data.menueList.filter((item:any) => item.number !== 'app')
 
+        if(pathname == '/'){
+            
+        }
+        basalInfo.menuInfo.menuList = menuList
+        // basalInfo.menuInfo.currentNavbar=[{id: 'selectProject', name: '选择项目'}];
+        // basalInfo.menuInfo.curLevelOneMenu={id: 'selectProject', name: '选择项目'};
     }
 }
 
@@ -325,17 +356,29 @@ export const selectProject = async (params: ordinaryObj) => {
     for (let index = 0; index < (window as any).frames.length; index++) {
         (window as any).frames[index] && (window as any).frames[index].postMessage(iframeInfo, '*');
     }
-
+    await getMenuList()
+    console.log('菜单')
     // await updateBasalInfor({that:params.that,stateChange:{basalInfo:{...basalInfo,aaa:'454654654'},visibleSelectProject:false}})
-    params.setState({...basalInfo,visibleSelectProject:false})
+    params._setBasalState({...basalInfo,visibleSelectProject:false})
 }
 
-//更新bascalInfo以及state
-
-export const updateState = (params:any) => {
-    
+//获取通知待办数量
+export const getToDoNumber = async () => {
+    const res = await services.getToDoNumber({projectId:(window as any).__SELECT_PROJECT_ID__});
+    if(isSuccess(res.code)){
+        basalInfo.todoNum = res.result.todoNum
+        basalInfo.noticeNum = res.result.noticeNum
+    }
 }
 
+
+export const isSuccess = (params:number | string):boolean => {
+    if( params == 200 || params == 201 || params == 'SUCCESS' ){
+        return true
+    }else{
+        return false
+    }
+}
 
 
 

@@ -18,10 +18,12 @@ import '../styles/HeaderRight.less';
 
 import * as CF from '../utils/commonFun'
 
-
+const { Consumer } = CF
 const { Option } = Select;
+
 //渲染操作的待办、通知、帮助与支持
 const renderOperationIcon = (list: Array<Object>) => {
+    console.log('list-----',list)
     return list.map((item: any,index) => {
         return (
             <div className="_ewec_layout_operate_badge_" onClick={item.onClick} key = {index}>
@@ -49,7 +51,7 @@ const renderOperationIcon = (list: Array<Object>) => {
 };
 export default (props: any) => {
     const { noticeNum = 99 } = props;
-    const iconList = [
+    let iconList = [
         {
             number: 10,
             name: '待办',
@@ -67,7 +69,7 @@ export default (props: any) => {
             img: email,
         },
         {
-            number: 10,
+            number: 0,
             name: '帮助与支持',
             width: 20,
             height: 20,
@@ -158,25 +160,34 @@ export default (props: any) => {
             </Popover>
         </div>
     );
-    const { Consumer } = CF
+    
+
     const onChangeSelectProject = (value:string,setState:Function,basalState:any)=>{
-        debugger
+
         const {allProjectList} = basalState
         let newPro:Array<any> = allProjectList.filter((item:any) => item.id == value)
         let newCtr = newPro[0].contractList
+
         localforage.setItem('projectList', newPro);
         (window as any).__PROJECT_LIST__ = newPro;
+
         localforage.setItem('contractList', newCtr);
         (window as any).__CONTRACT_LIST__ = newCtr;
+
+        (window as any).__SELECT_PROJECT_ID__ = newPro[0].id;
+        sessionStorage.selectPrjId = newPro[0].id;
+        
         setState({...basalState,projectList:newPro,contractList:newCtr})
     }
+
     return (
         <Consumer>
             {
                 (value) => {
-                    const { allProjectList = [], setState, userIndentity, selectProjectId, visibleSelectProject } = value
-                    console.log('allProjectList----',allProjectList)
-                    console.log('selectProjectId----',selectProjectId)
+                    console.log('value========184---',value)
+                    const { allProjectList = [], setState, userIndentity, selectProjectId, visibleSelectProject, noticeNum, todoNum } = value
+                    iconList[0].number = todoNum;
+                    iconList[1].number = noticeNum;
                     return (
                         <div className="_ewec_layout_operate_">
                             {userIndentity !== 'owner' && selectProjectId && !visibleSelectProject &&
@@ -201,7 +212,7 @@ export default (props: any) => {
                                     </Select>
                                 // </div>
                             }
-                            {renderOperationIcon(iconList)}
+                            {userIndentity !== 'owner' && !visibleSelectProject && renderOperationIcon(iconList)}
                             <Tooltip title="操作列表" placement="bottom">
                                 <Dropdown trigger={['click']} overlay={operationList}>
                                     {/* <Dropdown trigger="click" > */}

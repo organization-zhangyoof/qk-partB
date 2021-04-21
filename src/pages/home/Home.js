@@ -22,17 +22,43 @@ const Home = (props) => {
             })
         }
     }
-    
+    const Consumer = window.__Consumer__
+    console.log("props-------",props)
+    console.log("Consumer-------",Consumer)
+    const b = (a)=>{
+        a = "发生改变"
+    }
     return(
-        <div style={{width:'100%',height:'100%',background:'#FAE5E5'}}>
-            <div>
-                <Header {...headerProps}/>
-            </div>
-            <div>
-                <Body {...bodyProps}/>
-            </div>
-        </div>
+        <Consumer>
+        {
+            (value) => {
+                console.log("***home***value------",value)
+                return (
+                    <div style={{width:'100%',height:'100%',background:'#FAE5E5'}}>
+                        <div>
+                            <Header {...headerProps}/>
+                        </div>
+                        <div>
+                            <Body {...bodyProps}/>
+                            {/* <div>次出显示：{aaaa}</div>
+                            <Button onClick ={()=>{b(aaaa)}}>4567897</Button> */}
+                        </div>
+                    </div>
+                )
+            }
+        }
+        </Consumer>
     )
+    // return (
+    //                     <div style={{width:'100%',height:'100%',background:'#FAE5E5'}}>
+    //                         <div>
+    //                             <Header {...headerProps}/>
+    //                         </div>
+    //                         <div>
+    //                             <Body {...bodyProps}/>
+    //                         </div>
+    //                     </div>
+    //                 )
 }
 function mapStateToProps(state) {
     return {...state};

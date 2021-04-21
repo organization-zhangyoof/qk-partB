@@ -1,0 +1,49 @@
+@import '~antd/lib/style/themes/default.less';
+
+._ewec_layout_submenu_ {
+    width: 100%;
+    background: #fff;
+    position: absolute;
+    top: 70px;
+    left: 0;
+    z-index: 99999;
+    box-shadow: 10px 10px 10px #dadada;
+    padding: 15px 80px 0;
+    display: flex;
+    flex-wrap: wrap;
+
+    ._ewec_layout_submenu_item_ {
+        padding: 0 20px 20px;
+        width:240px;
+        ._ewec_layout_submenu_item_two_ {
+            padding: 0px 20px 5px 10px;
+            border-bottom: 1px solid #eee;
+            // border-left: 3px solid @primary-color;
+            font-weight: 900;
+            position: relative;
+            span {
+                display: inline-block;
+                width: 3px;
+                height: 20px;
+                position: absolute;
+                left: 0;
+                bottom: 5px;
+                background: @primary-color ;
+            } 
+        }
+        ._ewec_layout_submenu_item_three_{
+            padding:0 10px;
+            div{
+                cursor: pointer;
+                padding: 5px 0;
+                &:hover{
+                    color:@primary-color
+                }
+            }
+        }
+        .choice_menu{
+            color:@primary-color;
+            
+        }
+    }
+}

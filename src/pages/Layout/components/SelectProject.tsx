@@ -11,7 +11,7 @@ export default (props: any) => {
     const [result,setResult] = useState<ordinaryObj>({})
     return (
         <Consumer>
-            {({projectList = [],setState}) => {
+            {({projectList = [],_setBasalState}) => {
                 return (
                     <div className="_ewec_layout_select_project_">
                         <div className="_select_project_container_">
@@ -42,7 +42,7 @@ export default (props: any) => {
                             </div>
                             <div className="_select_project_footer_">
                                 <Button type="primary" 
-                                    onClick={()=>{selectProject({setState,project:result})}}>
+                                    onClick={()=>{selectProject({_setBasalState,project:result})}}>
                                     进入项目
                                 </Button>
                             </div>
